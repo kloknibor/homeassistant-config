@@ -1,0 +1,202 @@
+title: Thús
+resources:
+  - url: /local/card-tools.js?v=0.0.2
+    type: js
+  - url: /local/layout-card.js?v=0.0.2
+    type: js
+  - url: /community_plugin/compact-custom-header/compact-custom-header.js
+    type: module
+  - url: /local/surveillance-card.js?v=0
+    type: module
+  - url: /local/tracker-card.js?track=true
+    type: module
+  - url: /community_plugin/lovelace-xiaomi-vacuum-card/xiaomi-vacuum-card.js
+    type: js
+cch:
+  options: clock
+views:
+    # View tab title.
+#  - title: update
+ #   panel: false
+  #  cards: 
+   #   - type: custom:tracker-card
+  - title: home
+    icon: mdi:home
+    panel: true
+    cards:
+      - type: custom:layout-card
+        layout: vertical
+        cards:
+          - type: entities
+            title: Entities card sample
+            show_header_toggle: false
+            entities:
+              - climate.woonkamer
+              - climate.slaapkamer
+              - climate.studeerkamer
+              - climate.warm_water
+          - type: entities
+            title: Entities card sample
+            show_header_toggle: false
+            entities:
+              - binary_sensor.0x00158d00028de7c1_contact
+              - binary_sensor.0x00158d00028de79b_contact
+              - binary_sensor.0x00158d0002375c95_water_leak
+          - type: picture-glance
+            entities: []
+            camera_image: camera.dafang3
+          - break
+          - type: weather-forecast
+            entity: weather.br_unknown_station
+          - type: media-control
+            entity: media_player.spotify
+          - type: custom:xiaomi-vacuum-card
+            entity: vacuum.xiaomi_vacuum_cleaner
+            image: /local/custom/folder/background.png
+            name: Xiaomi Vacuum
+            buttons: true
+            labels:
+              status: Status
+              battery: Battery
+              mode: Mode
+              main_brush: Main brush
+              side_brush: Side brush
+              filter: Filter
+              sensor: Sensor
+  - title: verbruik
+    icon: mdi:chart-bell-curve
+    panel: true
+    cards:
+      - type: custom:layout-card
+        layout: vertical
+        cards:
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/ZQ1KGmkgz/stroom-vandaag?orgId=1&panelId=6&from=now%2Fd&to=now 
+            aspect_ratio: 50%
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/ZQ1KGmkgz/stroom-vandaag?orgId=1&panelId=2&from=now%2Fd&to=now
+            aspect_ratio: 50%
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/FoNOgizgz/overview?orgId=1&panelId=2&from=now%2Fd&to=now
+            aspect_ratio: 50%
+          - break
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/ZQ1KGmkgz/stroom-vandaag?orgId=1&panelId=8&from=now%2Fd&to=now
+            aspect_ratio: 50%      
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/ZQ1KGmkgz/stroom-vandaag?orgId=1&from=now%2Fd&to=now&panelId=4
+            aspect_ratio: 50%
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/FoNOgizgz/overview?orgId=1&panelId=4&from=now%2Fd&to=now
+            aspect_ratio: 50%
+  - title: verbruik langetermijn
+    icon: mdi:chart-areaspline
+    panel: true
+    cards:
+      - type: custom:layout-card
+        layout: vertical
+        cards:
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/1ASGVmkRk/verbruik-maand?orgId=1&panelId=4&from=now%2FM&to=now
+            aspect_ratio: 50%
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/xC-CeKzRz/verbruik-jaar?orgId=1&panelId=5&from=now%2Fy&to=now
+            aspect_ratio: 50%
+          - break
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/1ASGVmkRk/verbruik-maand?orgId=1&panelId=7&from=now%2FM&to=now
+            aspect_ratio: 50%
+          - type: iframe
+            url: https://robinkolk.dev/grafana/d-solo/xC-CeKzRz/verbruik-jaar?orgId=1&panelId=9&from=now%2Fy&to=now
+            aspect_ratio: 50%
+  - title: Media
+    icon: mdi:play-circle-outline
+    cards: 
+      - type: media-control
+        entity: media_player.huiskamer
+      - type: media-control
+        entity: media_player.huiskamer_echte
+      - type: media-control
+        entity: media_player.huiskamer_tv
+      - type: media-control
+        entity: media_player.ziggo_mediabox
+  - title: system
+    icon: mdi:harddisk
+    panel: true
+    cards:
+      - type: custom:layout-card
+        layout: vertical
+        cards:
+          - type: gauge
+            name: CPU
+            unit: '%'
+            entity: sensor.processor_use
+            severity:
+              green: 0
+              yellow: 45
+              red: 85
+          - type: sensor
+            entity: sensor.processor_use
+            graph: line
+            detail: 2
+          - break
+          - type: gauge
+            name: Memory           
+            unit: '%'
+            entity: sensor.memory_use_percent
+            severity:
+              green: 0
+              yellow: 45
+              red: 85
+          - type: sensor
+            entity: sensor.memory_use_percent
+            graph: line
+            detail: 2
+          - break
+          - type: gauge
+            name: Disk           
+            unit: '%'
+            entity: sensor.disk_use_percent_home
+            severity:
+              green: 0
+              yellow: 45
+              red: 85
+          - type: sensor
+            entity: sensor.disk_use_percent_home
+            graph: line
+            detail: 2
+  - title: Lichten
+    icon: mdi:lightbulb
+    cards:
+          - type: light
+            entity: light.keuken_lampen
+            name: Keuken
+          - type: light
+            entity: light.woonkamer_lampen
+            name: Woonkamer
+          - type: light
+            entity: light.tradfri_bulb_7
+            name: Kelder
+          - type: light
+            entity: light.tradfri_bulb_e27_ws_opal_980lm
+            name: Slaapkamer
+          - type: light
+            entity: light.tradfri_bulb_e27_cws_opal_600_2
+            name: Overloop
+  - title: Dev
+    show_header_toggle: false
+    cards:
+          - type: entities
+            title: Zonnepanelen
+            entities:
+              - sensor.freq_solar
+              - sensor.iac_solar
+              - sensor.idc_solar
+              - sensor.pac_solar
+              - sensor.pdc_solar
+              - sensor.runtime_solar
+              - sensor.temp_solar
+              - sensor.vac_solar
+              - sensor.vdc_solar
+              - sensor.wtot_solar
+

@@ -1,0 +1,10 @@
+- id: '1567508060283'
+  alias: Set theme at startup
+  trigger:
+  - event: start
+    platform: homeassistant
+  condition: []
+  action:
+  - data:
+      name: midnight
+    service: frontend.set_theme

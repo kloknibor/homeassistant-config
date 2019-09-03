@@ -1,0 +1,583 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 0
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: UTC
+  # Customization file
+  customize: !include customize.yaml
+
+  whitelist_external_dirs:
+    - /record
+    - /tmp
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_bot_api_key
+    allowed_chat_ids:
+      - !secret telegram_bot_chat_id
+
+namecheapdns:
+  domain: robinkolk.dev
+  password: !secret namecheap_password
+
+# Example configuration.yaml entry for the notifier
+notify:
+  - name: TelegramBot
+    platform: telegram
+    chat_id: !secret telegram_bot_chat_id
+
+hacs:
+  token: !secret hacs_token
+  theme: True
+
+rflink:
+  port:  /dev/ttyUSB1
+
+stream: 
+
+ring:
+  username: !secret ring_username
+  password: !secret ring_password
+
+binary_sensor:
+  - platform: ring
+  - platform: rflink
+    devices:
+      newkaku_01d4f0f2_2:
+        name: Keuken schakelaar
+        device_class: light
+      newkaku_0118cb96_1:
+        name: Woonkamer knop rechts
+        device_class: light
+      newkaku_0118cb96_2:
+        name: Woonkamer knop links
+        device_class: light
+  - platform: mqtt
+    name: "auto opslot"
+    state_topic: "nr/auto_opslot"
+    device_class: lock
+
+ffmpeg:
+
+konnected:
+  access_token: !secret konnected_token
+  devices:
+    - id: !secret konnected_id
+      binary_sensors:
+        - zone: 1
+          type: door
+          name: 'Front Door'
+        - zone: 2
+          type: motion
+          name: 'Hal'
+        - zone: 3
+          type: motion
+          name: 'Woonkamer'
+        - zone: 4
+          type: motion
+          name: 'Keuken'
+        - zone: 5
+          type: problem
+          name: 'Alarm'
+
+duckdns:
+  domain: robink
+  access_token: !secret duckdns_token
+
+# Show links to resources in log and frontend
+# introduction:
+
+# Enables the frontend
+frontend:
+  themes: !include theme_midnight.yaml
+
+# Enables configuration UI
+config:
+
+camera:
+  - platform: generic
+    name: DaFang3
+    username: !secret camera_username
+    password: !secret camera_password
+    authentication: basic
+    still_image_url: https://192.168.1.120/cgi-bin/currentpic.cgi
+    stream_source: rtsp://192.168.1.120:8554/unicast
+    verify_ssl: false
+    scan_interval: 1
+  - platform: generic
+    name: AchterTuin
+    username: !secret camera_username
+    password: !secret camera_password
+    authentication: basic
+    still_image_url: https://192.168.1.121/cgi-bin/currentpic.cgi
+    stream_source: rtsp://192.168.1.121:8554/unicast
+    verify_ssl: false
+    scan_interval: 1
+  - platform: ring
+
+ios:
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+system_health:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+light:
+  - platform: rflink
+    automatic_add: true
+    devices:
+      newkaku_01e81c12_1:
+        name: Eettafel
+        type: hybrid
+      tristate_001252_1:
+        name: overkapping_lichten
+        type: toggle
+      !secret auto_opslot:
+        name: auto_opslot
+        type: toggle
+      !secret auto_open:
+        name: auto_open
+        type: toggle
+      !secret auto_3e_knopje:
+        name: 3e_auto_knopje
+        type: toggle
+  - platform: group
+    name: Keuken_lampen
+    entities:
+      - light.0x000b57fffe392004_light
+      - light.0x000b57fffe4b8bb3_light
+  - platform: group
+    name: Woonkamer_lampen
+    entities:
+      - light.tradfri_bulb_gu10_w_400lm
+      - light.tradfri_bulb_gu10_ws_400lm_3
+
+switch:
+  - platform: broadlink
+    host: 192.168.1.115
+    mac: '78:0f:77:5A:BE:AD'
+    timeout: 15
+    switches:
+       tv_woonkamer:
+        friendly_name: "Woonkamer TV"
+        command_on: 'JgBGAJOVEzcSORE5ERQSExITEhMSExI4EjkRORITEhMSExITEhMSFBE5EhMSExITEhMSExIUETkRFBI4EjgSORE5ETkSOBIADQUAAA=='
+        command_off: 'JgBGAJOVEzcSORE5ERQSExITEhMSExI4EjkRORITEhMSExITEhMSFBE5EhMSExITEhMSExIUETkRFBI4EjgSORE5ETkSOBIADQUAAA=='
+       stofzuiger_beneden:
+        friendly_name: "SuckieSuckie"
+        command_on: 'JgBMAAcAA6EAASiUERQRFBAUERQQFBEUETkQFRA5ERQRORETETkRFBA6EBUQFBEUEDoQFBEUEBQROREUETkRORAUETkRORA6EBQROREADQUAAAAAAAAAAAAAAAA=='
+        command_off: 'JgBIAAABKJQRFBEUEBQRFBAUERQQOhEUEDoQFBE5ERQQOREUEDoQFRA5ERQRFBAUETkRFA8VERQRFBA5ETkROREUEDkRORE5EQANBQ=='
+
+# recoder
+recorder:
+  purge_keep_days: 50
+
+# Weather prediction
+sensor:
+  - platform: rflink
+    automatic_add: true
+  - platform: rpi_power
+    text_state: true
+  - platform: yr
+  - platform: dsmr
+    port: /dev/ttyUSB0
+    dsmr_version: 2.2
+  - platform: MasterVoltXS
+    TCP_PORT: 5678
+    TCP_IP: 192.168.1.173
+    RECONNECT_INTERVAL: 30
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /home
+      - type: memory_use_percent
+      - type: processor_use
+      - type: last_boot
+      - type: load_1m
+      - type: load_5m
+      - type: load_15m
+      - type: network_in
+        arg: 'eth0'
+      - type: network_out
+        arg: 'eth0'
+      - type: throughput_network_in
+        arg: 'eth0'
+      - type: throughput_network_out
+        arg: 'eth0'
+  - platform: afvalbeheer
+    wastecollector: DAR            
+    resources:                       
+      - restafval
+      - gft
+      - papier
+      - pmd
+    postcode: !secret postcode              
+    streetnumber: !secret huis_nr                 
+    upcomingsensor: 1         
+  - platform: mqtt
+    state_topic: 'nr/powerConsumption'
+    name: 'Total_power_consumption'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/powerProduction'
+    name: 'Total_power_production'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/power_consumption_prior_day'
+    name: 'power_consumption_prior_day'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/power_production_prior_day'
+    name: 'power_production_prior_day'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/power_consumption_begin_month'
+    name: 'power_consumption_begin_month'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/power_production_begin_month'
+    name: 'power_production_begin_month'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/gas_consumption_begin_month'
+    name: 'gas_consumption_begin_month'
+    unit_of_measurement: 'm3'
+  - platform: mqtt
+    state_topic: 'nr/gas_consumption_prior_day'
+    name: 'gas_consumption_prior_day'
+    unit_of_measurement: 'm3'
+  - platform: mqtt
+    state_topic: 'nr/powerProductionDelta'
+    name: 'delta_power2'
+    unit_of_measurement: 'kW'
+  - platform: mqtt
+    state_topic: 'nr/powerConsumptionBegin'
+    name: 'powerconsumption'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/powerProductionBegin'
+    name: 'powerProductionBegin'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/gasBegin'
+    name: 'gasSinceBegin'
+    unit_of_measurement: 'm3'
+  - platform: mqtt
+    state_topic: 'nr/DeltaPowerBegin'
+    name: 'DeltaPowerBegin'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/powerConsumedSinceBegin'
+    name: 'PowerConsumedSinceBegin'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/powerProducedSinceBegin'
+    name: 'powerProducedSinceBegin'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/gasConsumedSinceBegin'
+    name: 'gasConsumedSinceBegin'
+    unit_of_measurement: 'm3'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerDelta'
+    name: 'totalPowerDelta'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerDeltaSinceBegin'
+    name: 'totalPowerDeltaSinceBegin'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalGasToday'
+    name: 'totalGasToday'
+    unit_of_measurement: 'm3'
+  - platform: mqtt
+    state_topic: 'nr/powerConsumedThisMonth'
+    name: 'powerConsumedThisMonth'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/powerProducedThisMonth'
+    name: 'powerProducedThisMonth'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerDeltaThisMonth'
+    name: 'totalPowerDeltaThisMonth'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalGasThisMonth'
+    name: 'totalGasThisMonth'
+    unit_of_measurement: 'm3'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerConsumedToday'
+    name: 'totalPowerConsumedToday'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerProductionToday'
+    name: 'totalPowerProductionToday'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerDeltaToday'
+    name: 'totalPowerDeltaToday'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerDeltaBeginMonth'
+    name: 'totalPowerDeltaBeginMonth'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/totalPowerDeltaPriorDay'
+    name: 'totalPowerDeltaTodayPriorDay'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/SolarW_begin_month'
+    name: 'SolarW_begin_month'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/SolarW_begin_day'
+    name: 'SolarW_Begin_day'
+    unit_of_measurement: 'kWh'
+  - platform: mqtt
+    state_topic: 'nr/Pac_Solar_kW'
+    name: 'Pac_Solar_kW'
+    unit_of_measurement: 'kW'
+weather:
+  - platform: buienradar
+
+# Text to speech
+tts:
+  - platform: google_translate
+    service_name: google_say
+
+# Cloud
+cloud:
+
+#group: !include groups.yaml
+#automation: !include automations.yaml
+#script: !include scripts.yaml
+
+#Tado
+tado:
+  username: !secret tado_username
+  password: !secret tado_password
+
+device_tracker:
+  - platform: tado
+    username: !secret tado_username
+    password: !secret tado_password
+    home_id: !secret tado_homeid
+
+media_player:
+  - platform: ziggo_mediabox_xl
+    host: 192.168.1.73
+    name: Ziggo Mediabox
+  - platform: spotify
+    client_id: !secret spotify_client_id
+    client_secret: !secret spotify_client_secret
+  
+mqtt:
+  discovery: true
+  broker: 192.168.1.100
+  port: 1883
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  birth_message:
+    topic: 'hass/status'
+    payload: 'online'
+  will_message:
+    topic: 'hass/status'
+    payload: 'offline'
+
+logger:
+  default: error
+  logs:
+    rflink: debug
+    homeassistant.components.rflink: debug
+  
+#logger:
+#  default: info
+#  logs:
+#    custom_components.sensor.MasterVoltXS: info
+#    homeassistant.components.mqtt: debug
+#    homeassistant.components.climate: info   
+#    homeassistant.helpers.entity: critical
+#    homeassistant.components.tado: info
+#   homeassistant.components.water_heater: info
+
+vacuum:
+  - platform: xiaomi_miio
+    host: 192.168.1.116
+    token: !secret vacuum_token
+
+group:
+  meter_readings:
+    name: Meter readings
+    entities:
+      - sensor.power_consumption_low
+      - sensor.power_consumption_normal
+      - sensor.power_production_low
+      - sensor.power_production_normal
+      - sensor.gas_consumption
+
+automation:
+  - alias: 'Set woonkamer thermostat operation_mode based on input_select'
+    trigger:
+      platform: state
+      entity_id: input_select.tado_woonkamer_operation_mode
+    action:
+      service: climate.set_operation_mode
+      entity_id: climate.woonkamer
+      data_template:
+        operation_mode: "{{ states('input_select.tado_woonkamer_operation_mode') }}"
+  - alias: 'Set input_select based on woonkamer thermostat operation_mode'
+    trigger:
+      platform: state
+      entity_id: climate.woonkamer
+    condition:
+      condition: template
+      value_template: '{{ trigger.to_state.attributes.operation_mode != trigger.from_state.attributes.operation_mode }}'
+    action:
+      service: input_select.select_option
+      entity_id: input_select.tado_woonkamer_operation_mode
+      data_template:
+        option: '{{ states.climate.woonkamer.attributes.operation_mode }}'
+  - alias: 'Set slaapkamer thermostat operation_mode based on input_select'
+    trigger:
+      platform: state
+      entity_id: input_select.tado_slaapkamer_operation_mode
+    action:
+      service: climate.set_operation_mode
+      entity_id: climate.slaapkamer
+      data_template:
+        operation_mode: "{{ states('input_select.tado_slaapkamer_operation_mode') }}"
+  - alias: 'Set input_select based on slaapkamer thermostat operation_mode'
+    trigger:
+      platform: state
+      entity_id: climate.slaapkamer
+    condition:
+      condition: template
+      value_template: '{{ trigger.to_state.attributes.operation_mode != trigger.from_state.attributes.operation_mode }}'
+    action:
+      service: input_select.select_option
+      entity_id: input_select.tado_slaapkamer_operation_mode
+      data_template:
+        option: '{{ states.climate.slaapkamer.attributes.operation_mode }}'
+  - alias: 'Set studeerkamer thermostat operation_mode based on input_select'
+    trigger:
+      platform: state
+      entity_id: input_select.tado_studeerkamer_operation_mode
+    action:
+      service: climate.set_operation_mode
+      entity_id: climate.studeerkamer
+      data_template:
+        operation_mode: "{{ states('input_select.tado_studeerkamer_operation_mode') }}"
+  - alias: 'Set input_select based on studeerkamer thermostat operation_mode'
+    trigger:
+      platform: state
+      entity_id: climate.studeerkamer
+    condition:
+      condition: template
+      value_template: '{{ trigger.to_state.attributes.operation_mode != trigger.from_state.attributes.operation_mode }}'
+    action:
+      service: input_select.select_option
+      entity_id: input_select.tado_studeerkamer_operation_mode
+      data_template:
+        option: '{{ states.climate.studeerkamer.attributes.operation_mode }}'
+  - alias: 'Set warm_water thermostat operation_mode based on input_select'
+    trigger:
+      platform: state
+      entity_id: input_select.tado_warm_water_operation_mode
+    action:
+      service: climate.set_operation_mode
+      entity_id: climate.warm_water
+      data_template:
+        operation_mode: "{{ states('input_select.tado_warm_water_operation_mode') }}"
+  - alias: 'Set input_select based on warm_water thermostat operation_mode'
+    trigger:
+      platform: state
+      entity_id: climate.warm_water
+    condition:
+      condition: template
+      value_template: '{{ trigger.to_state.attributes.operation_mode != trigger.from_state.attributes.operation_mode }}'
+    action:
+      service: input_select.select_option
+      entity_id: input_select.tado_warm_water_operation_mode
+      data_template:
+        option: '{{ states.climate.warm_water.attributes.operation_mode }}'
+
+miele:
+    client_id: !secret miele_client_id
+    client_secret: !secret miele_secret
+    lang: en
+
+input_select:
+  tado_woonkamer_operation_mode:
+    name: 'Woonkamer mode'
+    options:
+      - 'Smart schedule'
+      - 'Tado mode'
+      - 'Manual'
+      - 'Off'
+    initial: Smart schedule
+    icon: mdi:settings
+  tado_slaapkamer_operation_mode:
+    name: 'Slaapkamer mode'
+    options:
+      - 'Smart schedule'
+      - 'Tado mode'
+      - 'Manual'
+      - 'Off'
+    initial: Smart schedule
+    icon: mdi:settings
+  tado_studeerkamer_operation_mode:
+    name: 'Studeerkamer mode'
+    options:
+      - 'Smart schedule'
+      - 'Tado mode'
+      - 'Manual'
+      - 'Off'
+    initial: Smart schedule
+    icon: mdi:settings
+  tado_warm_water_operation_mode:
+    name: 'Warm water mode'
+    options:
+      - 'Smart schedule'
+      - 'Tado mode'
+      - 'Manual'
+      - 'Off'
+    initial: Smart schedule
+    icon: mdi:settings
+    
+lovelace:
+  mode: yaml
+
+influxdb:
+  host: localhost
+  max_retries: 5
