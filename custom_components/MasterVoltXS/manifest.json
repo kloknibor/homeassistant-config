@@ -1,0 +1,10 @@
+{
+  "domain": "MasterVoltXS",
+  "name": "MasterVoltXS",
+  "documentation": "https://www.home-assistant.io/components/MastervoltXS",
+  "requirements": [
+    "XSsolar==0.8"
+  ],
+  "dependencies": [],
+  "codeowners": ["kloknibor" , "Jorg Janssen"]
+}
